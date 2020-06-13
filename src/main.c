@@ -38,7 +38,7 @@ int main() {
   while (1){
 
 	  if(read(fduart, &byte, 1) == 1){
-		  if(readMidiMessage(byte,&numOfBytes) == TRUE){
+		  if(readMidiMessage(byte,&numOfBytes) == TRUE && changed == FALSE){
 			 sendMidiMessage(fduart,numOfBytes);
 		  }
 	  }
