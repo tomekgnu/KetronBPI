@@ -9,6 +9,7 @@ RM := rm -rf
 # All of the sources participating in the build are defined here
 -include sources.mk
 -include src/subdir.mk
+-include lcd/subdir.mk
 -include input/subdir.mk
 -include subdir.mk
 -include objects.mk
@@ -30,7 +31,7 @@ all: KetronBPI
 KetronBPI: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: Cross GCC Linker'
-	arm-linux-gnueabihf-gcc  -o "KetronBPI" $(OBJS) $(USER_OBJS) $(LIBS)
+	arm-linux-gnueabihf-gcc -L/home/nanker/Embedded/buildroot/output/host/arm-buildroot-linux-gnueabihf/sysroot/usr/lib -o "KetronBPI" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
