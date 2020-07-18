@@ -38,7 +38,7 @@ int main(int argc,char *argv[]) {
 	DFBRectangle srect;
 
 	int fd_uart, fd_spi; /* file descriptors for UART-midi and spimega */
-	unsigned char inputdata[6]; /* 6 inputs from atmega */
+	unsigned char inputdata[8] = {0,0,0,0,0,0,0,0}; /* 6 inputs from atmega */
 	unsigned char byte, numOfBytes; /* for UART-Midi communication */
 	struct bank *currentBank = bankArray[bankA]; /* Bank A selected initially */
 
@@ -105,7 +105,6 @@ int main(int argc,char *argv[]) {
 
 
 	while (keep_running) {
-
 		//fbg_flip(fbg);
 		if (read(fd_uart, &byte, 1) == 1) {
 			if (readMidiMessage(byte, &numOfBytes) == TRUE && joychanged == FALSE) {
@@ -113,7 +112,9 @@ int main(int argc,char *argv[]) {
 			}
 		}
 
-		if (read(fd_spi, inputdata, 6) > 0) {
+		if (read(fd_spi, inputdata, 6) > 0){
+			if((*((uint64_t *)inputdata)) == 0x0000FFFFFFFFFFFF)
+				continue;
 			translateJoystick(inputdata[JOYX], inputdata[JOYY], &joyx, &joyy);
 			sleepTime = calculateSleepTime(joyx);
 			joychanged = TRUE;
