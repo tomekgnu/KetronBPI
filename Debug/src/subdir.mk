@@ -32,7 +32,7 @@ C_DEPS += \
 src/%.o: ../src/%.c
 	@echo 'Building file: $<'
 	@echo 'Invoking: Cross GCC Compiler'
-	arm-linux-gnueabihf-gcc -I"/home/nanker/workspace/KetronBPI/include" -I/home/nanker/Embedded/buildroot/output/build/directfb-examples-1.7.0/src -I/home/nanker/Embedded/buildroot/output/build/directfb-1.7.7/lib -I/home/nanker/Embedded/buildroot/output/build/directfb-1.7.7/include -I"/home/nanker/workspace/fbg/src" -O0 -g3 -Wall -Werror -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"
+	arm-linux-gnueabihf-gcc -I"/home/nanker/workspace/KetronBPI/include" -I/home/nanker/Embedded/buildroot/output/build/directfb-examples-1.7.0/src -I/home/nanker/Embedded/buildroot/output/build/directfb-1.7.7/lib -I/home/nanker/Embedded/buildroot/output/build/directfb-1.7.7/include -O0 -g3 -Wall -Werror -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 

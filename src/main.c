@@ -13,10 +13,14 @@
 #include "main.h"
 #include "midi.h"
 #include "controls.h"
-#include "fbgraphics.h"
 
 extern void *bankArray[5];
-int main2( int argc, char *argv[] );
+const char *tomba = "Tomba World";
+
+IDirectFB *dfb = NULL;
+IDirectFBSurface *psurface = NULL;
+IDirectFBSurface *ssurface = NULL;
+IDirectFBFont *font_16 = NULL;
 
 int keep_running = 1;
 
@@ -25,6 +29,13 @@ void int_handler(int dummy) {
 }
 
 int main(int argc,char *argv[]) {
+
+	int s_width, s_height;
+	int font_h;
+
+	DFBSurfaceDescription psdes;
+	DFBFontDescription fdes;
+	DFBRectangle srect;
 
 	int fd_uart, fd_spi; /* file descriptors for UART-midi and spimega */
 	unsigned char inputdata[6]; /* 6 inputs from atmega */
@@ -48,7 +59,46 @@ int main(int argc,char *argv[]) {
 		exit(-1);
 	}
 
-	main2(argc,argv);
+	if(DirectFBInit(&argc, &argv) != DFB_OK ||DirectFBCreate(&dfb) != DFB_OK)
+		exit(EXIT_FAILURE);
+	dfb->SetCooperativeLevel( dfb, DFSCL_FULLSCREEN );
+		/*Initialize primary surface*/
+		psdes.flags	= DSDESC_CAPS | DSDESC_PIXELFORMAT;
+		psdes.caps	= DSCAPS_PRIMARY | DSCAPS_DOUBLE | DSCAPS_DEPTH;
+		psdes.pixelformat = DSPF_RGB16;
+		if(dfb->CreateSurface(dfb, &psdes, &psurface) != DFB_OK)
+			exit(EXIT_FAILURE);
+
+		/*Initialize fonts*/
+		fdes.flags	= DFDESC_HEIGHT;
+		fdes.height	= 16;
+		if(dfb->CreateFont(dfb, "Roboto-Bold.ttf", &fdes, &font_16)!= DFB_OK)
+				  exit(EXIT_FAILURE);
+
+		/*Setup main bakground*/
+		psurface->GetSize(psurface, &s_width, &s_height);
+		psurface->SetColor(psurface, 0x00, 0x00, 0xFF, 0xFF);
+		psurface->FillRectangle(psurface, 0, 0, s_width, s_height);
+		psurface->DrawRectangle(psurface, 0, 0, s_width, s_height);
+
+		/*Simple sub header with different color*/
+		font_16->GetHeight(font_16, &font_h);
+		srect.x = 0;
+		srect.y = 0;
+		srect.w = s_width;
+		srect.h = font_h + 2;
+		psurface->GetSubSurface(psurface, &srect, &ssurface);
+		ssurface->SetColor(ssurface, 0xff, 0x40, 0x00, 0xFF);
+		ssurface->FillRectangle(ssurface, 0, 0, s_width, font_h + 2);
+		ssurface->DrawRectangle(ssurface, 0, 0, s_width, font_h + 2);
+
+		/*write header in sub surface*/
+		ssurface->SetFont(ssurface, font_16);
+		ssurface->SetColor(ssurface, 0xFF, 0xFF, 0xFF, 0xFF);
+		ssurface->DrawString(ssurface, tomba, -1, s_width/2, 0,	DSTF_TOPCENTER);
+
+		psurface->Flip(psurface, NULL, DSFLIP_NONE);
+
 	midiInit();	// very important: MIDI_WAIT
 
 	sendProgramChange(fd_uart, currentBank->ID, 0); /* bank A program 1: Grand Piano */
@@ -77,6 +127,17 @@ int main(int argc,char *argv[]) {
 
 			if (joychanged == TRUE) {
 				printf("%d: %s\n", currentBank->index + 1,currentBank->names[currentBank->index]);
+				psurface->GetSubSurface(psurface, &srect, &ssurface);
+				ssurface->SetColor(ssurface, 0xff, 0x40, 0x00, 0xFF);
+				ssurface->FillRectangle(ssurface, 0, 0, s_width, font_h + 2);
+				ssurface->DrawRectangle(ssurface, 0, 0, s_width, font_h + 2);
+
+				/*write header in sub surface*/
+				ssurface->SetFont(ssurface, font_16);
+				ssurface->SetColor(ssurface, 0xFF, 0xFF, 0xFF, 0xFF);
+				ssurface->DrawString(ssurface, currentBank->names[currentBank->index], -1, s_width/2, 0,	DSTF_TOPCENTER);
+				//psurface->Flip(psurface, NULL, DSFLIP_NONE);
+				ssurface->Flip(ssurface,NULL,DSFLIP_NONE);
 				sendProgramChange(fd_uart, currentBank->ID, currentBank->index);
 				usleep(sleepTime);
 			}
@@ -85,6 +146,10 @@ int main(int argc,char *argv[]) {
 
 	close(fd_uart);
 	close(fd_spi);
+	ssurface->Release(ssurface);
+	font_16->Release(font_16);
+	psurface->Release(psurface);
+	dfb->Release(dfb);
 
 	return 0;
 }

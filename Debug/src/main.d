@@ -37,8 +37,7 @@ src/main.o: ../src/main.c \
  /home/nanker/workspace/KetronBPI/include/midi.h \
  /home/nanker/workspace/KetronBPI/include/MD_MIDIFile.h \
  /home/nanker/workspace/KetronBPI/include/main.h \
- /home/nanker/workspace/KetronBPI/include/controls.h \
- /home/nanker/workspace/fbg/src/fbgraphics.h
+ /home/nanker/workspace/KetronBPI/include/controls.h
 
 /home/nanker/Embedded/buildroot/output/build/directfb-1.7.7/lib/direct/clock.h:
 
@@ -117,5 +116,3 @@ src/main.o: ../src/main.c \
 /home/nanker/workspace/KetronBPI/include/main.h:
 
 /home/nanker/workspace/KetronBPI/include/controls.h:
-
-/home/nanker/workspace/fbg/src/fbgraphics.h:
