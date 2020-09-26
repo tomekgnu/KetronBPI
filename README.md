@@ -14,5 +14,5 @@
   - PD5: joystick press
   - PC5: button on Screw Shield
   - ADC0, ADC1: pots on Midi shield
-  - ADC2, ADC2: joystick X/Y axes
+  - ADC2, ADC3: joystick X/Y axes
   - PD6: interrupt signal for BananaPi
